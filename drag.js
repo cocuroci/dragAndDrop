@@ -1,68 +1,60 @@
-(function(window,$){
+(function(window){
 
 	var win 		= window,
 		doc 		= win.document,
-		file 		= null,
-		area 		= null,
+		drop 		= null,
 		imgs		= null,
-		date  		= null;
 		borderColor = null;
 
 	function initApp(event) {
 		//RECUPERA OS ELEMENTOS
-		area = doc.querySelector('#area');
-		imgs = doc.querySelector('#imgs');
-		date = doc.querySelector('#date');
-		borderColor = area.style.borderColor;
-		initEvents();
-		startDate();
+		drop = doc.querySelector('#drop');
+		imgs = doc.querySelectorAll('#images img');
+		borderColor = drop.style.borderColor;		
+		initEvents();		
 	}
 
-	function initEvents() {
-		doc.addEventListener('drop', dropCancel, false);
-		area.addEventListener('drop', dropArea, false);
-		area.addEventListener('dragenter', styleDrop, false);
-		area.addEventListener('dragleave', styleDrop, false);
+	function initEvents() {		
+		drop.addEventListener('drop', dropArea, false);
+		drop.addEventListener('dragenter', styleDrop, false);
+		drop.addEventListener('dragleave', styleDrop, false);
+		drop.addEventListener('dragover', styleDrop, false);
+
+		for (var i = 0; i < imgs.length; i++) {
+			imgs[i].addEventListener('dragstart', dragItems, false);
+			imgs[i].id = 'image'+i;
+		}
 	}
 
-	function dropCancel(event) {			
-		event.preventDefault();	
+	function dragItems(event) {		
+		event.dataTransfer.setData('Text', this.id)
 	}
 
 	function dropArea(event) {	
-		area.style.borderColor = borderColor;
+		drop.style.borderColor = borderColor;
 
-		if(event.dataTransfer.files.length) {
-			file = new FileReader();
-			file.addEventListener('load', fileLoad);
-			file.readAsDataURL(event.dataTransfer.files[0]);	
-		}		
+		var target = doc.querySelector('#' + event.dataTransfer.getData('Text'));
+		target.parentNode.removeChild(target);
 
-		event.preventDefault();	
-	}
-
-	function fileLoad(event) {	
 		var img = doc.createElement('img');
-		img.src = event.target.result;
-		img.className = 'itens';
-		imgs.appendChild(img);
+		img.src = target.src;
+		img.setAttribute('draggable', false)
 
+		drop.appendChild(img);
+
+		event.preventDefault();
 	}
 
 	function styleDrop(event) {	
 		if(event.type == 'dragenter') {
-			area.style.borderColor = 'red';
+			drop.style.borderColor = 'red';
 		} else if(event.type == 'dragleave') {
-			area.style.borderColor = borderColor;
-		}
-	}
-
-	function startDate() {	
-		var d = new Date();
-		date.innerHTML = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-		setTimeout(startDate,1000)
+			drop.style.borderColor = borderColor;
+		}		
+		event.preventDefault();
+		event.dataTransfer.dropEffect = 'copy';
 	}
 
 	//DOM ESTÁ PRONTO
 	doc.addEventListener('DOMContentLoaded', initApp, false);
-})(window,jQuery)
+})(window)
