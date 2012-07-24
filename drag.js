@@ -7,8 +7,8 @@
         borderColor = null;
 
     function initApp(event) {
-    //RECUPERA OS ELEMENTOS
-        drop = doc.querySelector('#drop');
+        //RECUPERA OS ELEMENTOS
+        drop = doc.getElementById('drop');
         imgs = doc.querySelectorAll('#images img');
         borderColor = drop.style.borderColor;		
         initEvents();		
